@@ -4,6 +4,8 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 
 const logger =require("./middlewares/logger");
+const { connectDB } = require("./config/db");
+
 const routes = require("./routes");
 const app = express();
 
@@ -24,6 +26,12 @@ app.get('/',(req,res)=>{
     res.send("server running");
 });
 
-app.listen(PORT,()=>{
-    console.log(`server running on port ${PORT}`);
-});
+const startServer = async () => {
+    await connectDB();
+
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+    });
+};
+
+startServer();
