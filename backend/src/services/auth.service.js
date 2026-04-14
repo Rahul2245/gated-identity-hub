@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { generateAccessToken } = require("../utils/jwt");
 const { generateRefreshToken } = require("../utils/token");
 
-const CreateOrGetUser = async (email) =>{
+const createOrGetUser = async (email) =>{
     const result = await pool.query(
         "SELECT * FROM users WHERE email=$1",[email]
     );
