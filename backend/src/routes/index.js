@@ -1,5 +1,7 @@
 const express = require("express");
 const authRoutes = require("../modules/auth/auth.routes");
+const authMiddleware = require("../middlewares/auth.middleware");
+const requireRole = require("../middlewares/rbac.middleware");
 
 
 const router = express.Router();
@@ -12,6 +14,26 @@ router.get("/health", (req, res) => {
         time: new Date().toISOString()
     });
 });
+
+//protected route
+router.get("/protected",authMiddleware,(req,res)=>{
+    res.json({
+        message: "You are authenticated",
+        user: req.user,
+    });
+});
+
+//Admin only route
+router.get(
+    "/admin",
+    authMiddleware,
+    requireRole("admin"),
+    (req, res) => {
+        res.json({
+            message: "Welcome Admin",
+        });
+    }
+);
 
 router.use("/auth",authRoutes);
 
