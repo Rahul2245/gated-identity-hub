@@ -5,7 +5,7 @@ const requestMagicLink = async (req, res) => {
     const { email } = req.body;
 
     
-    const magicLink = `http://localhost:5000/api/auth/verify?email=${email}`;
+    const magicLink = `http://localhost:${process.env.PORT}/api/auth/verify?email=${email}`;
 
     console.log("MAGIC LINK:", magicLink);
 
