@@ -2,7 +2,7 @@ const express = require("express");
 const authRoutes = require("../modules/auth/auth.routes");
 const authMiddleware = require("../middlewares/auth.middleware");
 const requireRole = require("../middlewares/rbac.middleware");
-
+const adminRoutes = require("../modules/admin/admin.routes");
 
 const router = express.Router();
 
@@ -34,6 +34,9 @@ router.get(
         });
     }
 );
+
+
+router.use("/admin", adminRoutes);
 
 router.use("/auth",authRoutes);
 

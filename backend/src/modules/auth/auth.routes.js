@@ -10,15 +10,9 @@ const router = express.Router();
 router.post("/request-link", requestMagicLink);
 router.get("/verify", verifyMagicLink);
 router.post("/refresh", refreshTokenHandler);
-router.get(
-    "/sessions",
-    getAllSessions
-);
 
-router.post(
-    "/revoke",
-    revokeSession
-);
+
+
 
 
 module.exports = router;
