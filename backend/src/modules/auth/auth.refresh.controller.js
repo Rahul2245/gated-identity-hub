@@ -1,6 +1,7 @@
 const { pool } = require("../../config/db");
 const bcrypt = require("bcrypt");
 const { generateAccessToken } = require("../../utils/jwt");
+const crypto = require("crypto");
 
 const refreshTokenHandler = async (req,res )=>{
     try{
@@ -43,6 +44,27 @@ const refreshTokenHandler = async (req,res )=>{
             });
         }
 
+        //revoke old token
+        await pool.query(
+           "UPDATE refresh_tokens SET is_revoked = true WHERE id = $1",
+    [validToken.id]
+        );
+
+        const newRefreshToken = crypto.randomBytes(40).toString("hex");
+
+        const hashedNewToken = await bcrypt.hash(newRefreshToken, 10);
+
+        const newExpiresAt = new Date();
+newExpiresAt.setHours(newExpiresAt.getHours() + 24);
+
+await pool.query(
+    `INSERT INTO refresh_tokens (user_id, hashed_token, expires_at)
+     VALUES ($1, $2, $3)`,
+    [validToken.user_id, hashedNewToken, newExpiresAt]
+);
+
+
+
         // Get user
         const userRes = await pool.query(
             "SELECT * FROM users WHERE id=$1",
@@ -56,6 +78,14 @@ const refreshTokenHandler = async (req,res )=>{
             id: user.id,
             role: user.role,
         });
+
+        //set new refresh token
+        res.cookie("refreshToken", newRefreshToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000,
+});
 
         // Send new access token cookie
         res.cookie("accessToken", newAccessToken, {
@@ -75,7 +105,10 @@ const refreshTokenHandler = async (req,res )=>{
             message: "Server error",
         });
     }
-}
+};
+
+
+
 
 module.exports = {
     refreshTokenHandler,
