@@ -34,6 +34,7 @@ const registerClient = async (req,res)=>{
         console.error(err);
 
         return res.status(400).json({
+            
             error: err.message
         });
     };
