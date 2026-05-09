@@ -4,7 +4,7 @@ const {createOAuthClient,
     getOAuthClientByClientId,
     createAuthorizationRequest,
 getAuthorizationRequestById,
-saveContent,
+saveConsent,
 createAuthorizationCode
                 }=require("./oauth.service");
 

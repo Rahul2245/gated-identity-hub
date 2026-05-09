@@ -142,7 +142,7 @@ const getAuthorizationRequestById = async (requestId)=>{
     return result.rows[0];
 }
 
-const saveContent = async ({
+const saveConsent = async ({
    userId,
     clientId,
     scopes
@@ -176,7 +176,7 @@ const createAuthorizationCode = async({
     redirectUri,
     scopes
 })=>{
-    const code = crypto.ramdomBytes(32).toString("hex");
+    const code = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now()+5*60*1000);
 
     const query =` 
@@ -216,6 +216,6 @@ module.exports = {
     getOAuthClientByClientId,
     createAuthorizationRequest,
     getAuthorizationRequestById,
-    saveContent,
+    saveConsent,
     createAuthorizationCode
 };
