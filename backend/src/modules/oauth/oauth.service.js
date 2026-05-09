@@ -46,7 +46,49 @@ const createOAuthClient = async ({
     };
 }
 
+const getUserClients = async (userId)=>{
 
+    const query = `
+    SELECT
+            id,
+            app_name,
+            client_id,
+            redirect_uris,
+            scopes,
+            created_at
+        FROM oauth_clients
+        WHERE created_by = $1
+        ORDER BY created_at DESC
+    
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    return result.rows;
+}
+
+const deleteOAuthClient = async (
+    id,
+    userId
+) => {
+
+    const query = `
+        DELETE FROM oauth_clients
+        WHERE id = $1
+        AND created_by = $2
+        RETURNING *
+    `;
+
+    const result =
+        await pool.query(query, [
+            id,
+            userId
+        ]);
+
+    return result.rows[0];
+};
 module.exports = {
-    createOAuthClient
+    createOAuthClient,
+    getUserClients,
+    deleteOAuthClient
 };
