@@ -87,8 +87,20 @@ const deleteOAuthClient = async (
 
     return result.rows[0];
 };
+
+const getOAuthClientByClientId = async (clientId)=>{
+    const query = `
+    SELECT *
+    FROM oauth_clients
+    WHERE client_id=$1`;
+
+    const result = await pool.query(query,[clientId]);
+
+    return result.rows[0];
+}
 module.exports = {
     createOAuthClient,
     getUserClients,
-    deleteOAuthClient
+    deleteOAuthClient,
+    getOAuthClientByClientId
 };

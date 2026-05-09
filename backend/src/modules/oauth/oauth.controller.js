@@ -1,6 +1,6 @@
-const {createOAuthClient,getUserClients,deleteOAuthClient}=require("./oauth.service");
+const {createOAuthClient,getUserClients,deleteOAuthClient,getOAuthClientByClientId}=require("./oauth.service");
 
-const {validateCreateClient}=require("./oauth.validation");
+const {validateCreateClient,validateAuthorizeQuery}=require("./oauth.validation");
 
 const registerClient = async (req,res)=>{
     try{
@@ -79,8 +79,71 @@ const removeClient = async (req,res)=>{
     }
 }
 
+const authorize = async (req,res)=>{
+    try{
+        validateAuthorizeQuery(req.query);
+
+
+        const {
+            client_id,
+            redirect_uri,
+            scope,
+            state
+        } = req.query;
+
+        //fetching oAuth client
+        const client= await getOAuthClientByClientId(client_id);
+
+        if(!client){
+             return res.status(400).json({
+                error: "Invalid client_id"
+            });
+        }
+
+         // Validate redirect URI
+        if (
+            !client.redirect_uris.includes(
+                redirect_uri
+            )
+        ) {
+
+            return res.status(400).json({
+                error: "Invalid redirect_uri"
+            });
+        }
+
+        // Check login
+        if (!req.user) {
+
+            return res.status(401).json({
+                error: "Login required"
+            });
+        }
+
+        return res.json({
+            message:
+                "OAuth authorize request valid",
+
+            client: {
+                app_name: client.app_name,
+                scopes: scope
+                    ? scope.split(" ")
+                    : []
+            }
+        });
+    }catch (err) {
+
+        console.error(err);
+
+        return res.status(400).json({
+            error: err.message
+        });
+    }
+}
+
 module.exports = {
     registerClient,
     getClients,
-    removeClient
+    removeClient,
+    authorize
 };
