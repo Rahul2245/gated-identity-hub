@@ -98,9 +98,124 @@ const getOAuthClientByClientId = async (clientId)=>{
 
     return result.rows[0];
 }
+
+const createAuthorizationRequest = async ({
+    clientId,
+    userId,
+    redirectUri,
+    scopes,
+    state
+
+})=>{
+    const query = `
+        INSERT INTO oauth_authorization_requests
+        (
+            client_id,
+            user_id,
+            redirect_uri,
+            scopes,
+            state
+        )
+        VALUES ($1,$2,$3,$4,$5)
+        RETURNING *
+    `;
+
+    const values = [
+        clientId,
+        userId,
+        redirectUri,
+        scopes,
+        state
+    ];
+    const result = await pool.query(query,values);
+    return result.rows[0];
+}
+
+const getAuthorizationRequestById = async (requestId)=>{
+    const query = `
+    SELECT *
+    FROM oauth_authorization_requests
+    WHERE id = $1
+    `;
+
+    const result = await pool.query(query,[requestId]);
+    return result.rows[0];
+}
+
+const saveContent = async ({
+   userId,
+    clientId,
+    scopes
+})=>{
+    const query =`
+     INSERT INTO oauth_consents
+        (
+            user_id,
+            client_id,
+            scopes
+        )
+        VALUES ($1,$2,$3)
+        RETURNING *
+    `;
+    
+    const result = await pool.query(
+        query,[
+            userId,
+            clientId,
+            scopes
+        ]
+    );
+
+    return result.rows[0];
+
+}
+
+const createAuthorizationCode = async({
+    clientId,
+    userId,
+    redirectUri,
+    scopes
+})=>{
+    const code = crypto.ramdomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now()+5*60*1000);
+
+    const query =` 
+     INSERT INTO oauth_authorization_codes
+        (
+            code,
+            client_id,
+            user_id,
+            redirect_uri,
+            scopes,
+            expires_at
+        )
+        VALUES ($1,$2,$3,$4,$5,$6)
+        RETURNING *
+    `;
+
+    const values = [
+        code,
+        clientId,
+        userId,
+        redirectUri,
+        scopes,
+        expiresAt
+    ];
+
+    const result = await pool.query(query,values);
+    return result.rows[0];
+}
+
+
+
+
 module.exports = {
     createOAuthClient,
     getUserClients,
     deleteOAuthClient,
-    getOAuthClientByClientId
+    getOAuthClientByClientId,
+    createAuthorizationRequest,
+    getAuthorizationRequestById,
+    saveContent,
+    createAuthorizationCode
 };
