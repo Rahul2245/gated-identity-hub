@@ -1,7 +1,7 @@
 const express=require("express");
 
 const router =express.Router();
-const {registerClient,getClients,removeClient, authorize, approveConsent}=require("./oauth.controller");
+const {registerClient,getClients,removeClient, authorize, approveConsent,token}=require("./oauth.controller");
 
 const authMiddleware=require("../../middlewares/auth.middleware");
 
@@ -21,6 +21,10 @@ router.post(
     "/consent/approve",
     authMiddleware,
     approveConsent
+)
+router.post(
+    "/token",
+    token
 )
 
 module.exports = router;

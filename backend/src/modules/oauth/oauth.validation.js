@@ -77,7 +77,50 @@ const validateAuthorizeQuery=(query)=>{
 
 }
 
+const validateTokenRequest = (body)=>{
+    const {
+        grant_type,
+        client_id,
+        client_secret,
+        code,
+        redirect_uri
+    } = body;
+
+    if(grant_type!=="authorization_code"){
+        throw new Error(
+            "Unsupported grant_type"
+        );
+    }
+
+     if (!client_id) {
+        throw new Error(
+            "client_id required"
+        );
+    }
+
+    if (!client_secret) {
+        throw new Error(
+            "client_secret required"
+        );
+    }
+
+    if (!code) {
+        throw new Error(
+            "authorization code required"
+        );
+    }
+
+    if (!redirect_uri) {
+        throw new Error(
+            "redirect_uri required"
+        );
+    }
+
+}
+
 
 module.exports = {
-    validateCreateClient,validateAuthorizeQuery
+    validateCreateClient,
+    validateAuthorizeQuery,
+    validateTokenRequest
 };

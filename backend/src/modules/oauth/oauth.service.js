@@ -207,6 +207,28 @@ const createAuthorizationCode = async({
 }
 
 
+const getAuthorizationCode =async (code)=>{
+    const query =`
+    SELECT *
+     FROM oauth_authorization_codes
+        WHERE code = $1
+    `;
+
+    const result = await pool.query(query,[code]);
+
+    return result.rows[0];
+}
+
+const markAuthorizationCodeUsed = async (code)=>{
+    const query =`
+    UPDATE oauth_authorization_codes
+        SET used = TRUE
+        WHERE code = $1
+    `;
+
+    await pool.query(query,[code]);
+}
+
 
 
 module.exports = {
@@ -217,5 +239,7 @@ module.exports = {
     createAuthorizationRequest,
     getAuthorizationRequestById,
     saveConsent,
-    createAuthorizationCode
+    createAuthorizationCode,
+    getAuthorizationCode,
+    markAuthorizationCodeUsed
 };
